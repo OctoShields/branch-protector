@@ -1,4 +1,4 @@
-﻿using branch_protector;
+﻿using branch_protector.Services;
 using Octokit.Webhooks;
 using Octokit.Webhooks.AspNetCore;
 

@@ -6,10 +6,10 @@ using Octokit.Webhooks.Events;
 using Octokit.Webhooks.Events.InstallationRepositories;
 using Octokit.Webhooks.Events.Repository;
 
-namespace branch_protector
+namespace branch_protector.Services
 {
     /// <summary>
-    /// Receives GitHub Events related to the Organization Repositories 
+    /// Handles GitHub Organization Events
     /// </summary>
     public class GitHubWebhookEventProcessor : WebhookEventProcessor
     {
@@ -20,6 +20,9 @@ namespace branch_protector
             _logger = logger;
         }
 
+        /// <summary>
+        /// Process GitHub Repository Events
+        /// </summary>
         protected override Task ProcessRepositoryWebhookAsync(WebhookHeaders headers, RepositoryEvent repositoryEvent, RepositoryAction action)
         {
 
