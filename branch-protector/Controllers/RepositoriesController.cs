@@ -22,6 +22,19 @@ namespace branch_protector.Controllers
         {
             return new string[] { "octo-guard", "octo-defender" };
         }
+
+        /// <summary>
+        /// Receives GitHub Events related to the Organization Repositories 
+        /// </summary>
+        /// <response code="200">Processed GitHub Event Successfully</response>
+        /// <response code="404">Could not process GitHub Event</response>
+        [HttpPost("webhook")]
+        public async Task<IActionResult> Webhook()
+        {
+            var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+            _logger.LogDebug($"--- Received GitHub Event ---- {json}");
+            return Ok();
+        }
     }
 }
 
