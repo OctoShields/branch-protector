@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="DotNetEnv" Version="2.3.0" />
+    <PackageReference Include="Octokit.Webhooks.AspNetCore" Version="1.3.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,6 +21,7 @@
     <None Remove="Models\" />
     <None Remove="Interfaces\" />
     <None Remove="Services\" />
+    <None Remove="Octokit.Webhooks.AspNetCore" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
