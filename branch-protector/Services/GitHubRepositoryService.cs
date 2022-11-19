@@ -1,5 +1,7 @@
 ﻿using System;
+using branch_protector.Constants;
 using branch_protector.Interfaces;
+using branch_protector.Models;
 using Octokit;
 using Octokit.Webhooks.Models;
 
@@ -52,6 +54,7 @@ namespace branch_protector.Services
                 return installationClient;
             } catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
                 _logger.LogTrace(ex.StackTrace);
             }
 
@@ -61,23 +64,34 @@ namespace branch_protector.Services
         /// <summary>
         /// Create Branch Protections for a specific branch within the repository
         /// </summary>
-        public async Task<BranchProtectionSettings> CreateBranchProtections(string owner, string repo, string branch, long installationId)
+        public async Task<BranchProtectionSettings> CreateBranchProtections(RepositoryPT repository)
         {
-            GitHubClient installationClient = await AuthenticateGitHubAppInstallation(installationId);
+            // Authenticate GitHub App Installation
+            GitHubClient installationClient = await AuthenticateGitHubAppInstallation(repository.InstallationId);
 
-            var branchProtection = new BranchProtectionSettingsUpdate(
+            // Create Branch Protections Settings
+            var branchProtectionSettings = new BranchProtectionSettingsUpdate(
                 null,
                 new BranchProtectionRequiredReviewsUpdate(
                     new BranchProtectionRequiredReviewsDismissalRestrictionsUpdate(false), true, false, 1),
                 null, false, false, false, false, false,true);
 
-            BranchProtectionSettings updateBranchProtections = new BranchProtectionSettings();
+            BranchProtectionSettings updateBranchProtectionsResponse = new BranchProtectionSettings();
             Octokit.Issue newIssue = new Octokit.Issue();
 
             try
             {
-                updateBranchProtections = await installationClient.Repository.Branch.UpdateBranchProtection(owner, repo, branch, branchProtection);
-                newIssue = await CreateIssue(owner, repo, "Main Branch Protections Set", "Hey @Pujolsluis main branch is now protected", installationId);
+                // Request to Update Branch Protections Settings in Repository
+                updateBranchProtectionsResponse =
+                    await installationClient
+                    .Repository
+                    .Branch
+                    .UpdateBranchProtection(repository.Owner,repository.Name,
+                                            repository.Branch, branchProtectionSettings);
+
+                // Create Issue to notify user of successful Branch update
+                newIssue = await CreateIssue(repository, new IssuePT(BranchProtectorConstants.issueBranchProtectionsTitle,
+                                                                     BranchProtectorConstants.issueBranchProtectionsBody));
             }
             catch (Exception ex)
             {
@@ -85,23 +99,35 @@ namespace branch_protector.Services
                 _logger.LogTrace(ex.StackTrace);
             }
 
-            return updateBranchProtections;
-
+            return updateBranchProtectionsResponse;
         }
 
         /// <summary>
         /// Create Issue with details of Branch Protections applied to Repository
         /// </summary>
-        public async Task<Octokit.Issue> CreateIssue(string owner, string repo, string title, string body, long installationId)
+        public async Task<Octokit.Issue> CreateIssue(RepositoryPT repository, IssuePT issue)
         {
-            GitHubClient installationClient = await AuthenticateGitHubAppInstallation(installationId);
+            // Authenticate GitHub App Installation
+            GitHubClient installationClient = await AuthenticateGitHubAppInstallation(repository.InstallationId);
 
-            var createIssue = new NewIssue(title);
-            createIssue.Body = "Hey @Pujolsluis the main branch is now protected.\n\n**Main Branch - Protections Enabled:**\n- Require a pull request before merging\n  - Require at least 1 approval before merging\n  - Dissmiss stale pull request approvals when new commits are pushed\n- Require conversation resolution before merging";
+            // Prepare new Issue data
+            var newIssue = new NewIssue(issue.Title);
+            newIssue.Body = issue.Body;
 
-            var newIssue = await installationClient.Issue.Create(owner, repo, createIssue);
+            Octokit.Issue issueResponse = new Octokit.Issue();
 
-            return newIssue;
+            try
+            {
+                // Request to Create new GitHub issue
+                issueResponse = await installationClient.Issue.Create(repository.Owner, repository.Name, newIssue);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                _logger.LogTrace(ex.StackTrace);
+            }
+
+            return issueResponse;
         }
 
         /// <summary>
@@ -109,27 +135,35 @@ namespace branch_protector.Services
         /// </summary>
         string GenerateJWTToken()
         {
+            // Initialize AppID from .env
             string appId = Environment.GetEnvironmentVariable("GITHUB_APP_ID");
             int appIdValue;
 
             Int32.TryParse(appId, out appIdValue);
-
             if (Int32.TryParse(appId, out appIdValue))
             {
-                Console.WriteLine(appId);
+                _logger.LogDebug($"Parsed {appId} successfully");
             }
             else
             {
-                Console.WriteLine($"Int32.TryParse could not parse '{appId}' to an int.");
+                _logger.LogError($"Int32.TryParse could not parse '{appId}' to an int.");
+                throw new ArgumentException("App ID could not be parsed, please verify .env file");
             }
 
+            // Initialize GitHub Private Key Source Path from .env
+            string privateKeySourcePath = Environment.GetEnvironmentVariable("GITHUB_PRIVATE_KEY_SOURCE");
+
+            if (string.IsNullOrEmpty(privateKeySourcePath))
+                throw new ArgumentException("App ID could not be parsed, please verify .env file");
+
+            // Initialize JWT Generator
             var generator = new GitHubJwt.GitHubJwtFactory(
-            new GitHubJwt.FilePrivateKeySource(Environment.GetEnvironmentVariable("GITHUB_PRIVATE_KEY_SOURCE")),
-            new GitHubJwt.GitHubJwtFactoryOptions
-            {
-                AppIntegrationId = appIdValue, // GitHub App ID
-                ExpirationSeconds = 600, //10 mins max
-            });
+                new GitHubJwt.FilePrivateKeySource(privateKeySourcePath),
+                new GitHubJwt.GitHubJwtFactoryOptions
+                {
+                    AppIntegrationId = appIdValue, // GitHub App ID
+                    ExpirationSeconds = 600, //10 mins max
+                });
 
             return generator.CreateEncodedJwtToken();
         }

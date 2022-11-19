@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using branch_protector.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Octokit.Webhooks;
 
@@ -18,10 +19,14 @@ namespace branch_protector.Controllers
             _logger = logger;
         }
 
+        /* TODO: Add extra functionality to web service for listing 
+         * repositories, pull request, and other useful information systems 
+         * can leverage across organization
+        */
         [HttpGet()]
         public IEnumerable<string> GetRepositories()
         {
-            return new string[] { "octo-guard", "octo-defender" };
+            return BranchProtectorConstants.repositoriesList;
         }
     }
 }

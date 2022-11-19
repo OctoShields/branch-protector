@@ -26,10 +26,12 @@
     <None Remove="Octokit.Webhooks.AspNetCore" />
     <None Remove="Octokit" />
     <None Remove="GitHubJwt" />
+    <None Remove="Constants\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="Interfaces\" />
     <Folder Include="Services\" />
+    <Folder Include="Constants\" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 ﻿using System;
+using branch_protector.Models;
 using Octokit;
 
 namespace branch_protector.Interfaces
@@ -7,8 +8,8 @@ namespace branch_protector.Interfaces
 	{
 		public GitHubClient AuthenticateGitHubApp();
         public Task<GitHubClient> AuthenticateGitHubAppInstallation(long installationId);
-        public Task<BranchProtectionSettings> CreateBranchProtections(string owner, string repo, string branch, long installationId);
-        public Task<Issue> CreateIssue(string owner, string repo, string title, string body, long installationId);
+        public Task<BranchProtectionSettings> CreateBranchProtections(RepositoryPT repository);
+        public Task<Issue> CreateIssue(RepositoryPT repository, IssuePT issue);
     }
 }
 
