@@ -1,4 +1,5 @@
-﻿using branch_protector.Services;
+﻿using branch_protector.Interfaces;
+using branch_protector.Services;
 using Octokit.Webhooks;
 using Octokit.Webhooks.AspNetCore;
 
@@ -14,6 +15,7 @@ internal class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
+        builder.Services.AddTransient<IRepositoryService, GitHubRepositoryService>();
         builder.Services.AddSingleton<WebhookEventProcessor, GitHubWebhookEventProcessor>();
 
         DotNetEnv.Env.Load();
