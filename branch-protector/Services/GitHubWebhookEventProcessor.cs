@@ -41,13 +41,14 @@ namespace branch_protector.Services
 
                     string repo = repositoryEvent.Repository != null ? repositoryEvent.Repository.Name : string.Empty;
                     string owner = repositoryEvent.Repository != null ? repositoryEvent.Repository.Owner.Login : string.Empty;
+                    string sender = repositoryEvent.Sender != null ? repositoryEvent.Sender.Login : string.Empty;
                     long installationId = repositoryEvent.Installation != null ? repositoryEvent.Installation.Id : 0;
 
                     // Selected branch to set Branch Protections
                     string branch = "main";
 
                     // Create branch protections for new repository
-                    _repositoryService.CreateBranchProtections(new RepositoryPT(owner, repo, branch, installationId));
+                    _repositoryService.CreateBranchProtections(new RepositoryPT(owner, repo, branch, sender, installationId));
                     break;
                 default:
                     _logger.LogDebug($"--- Received Unsupported Action {repositoryEvent.Action}");

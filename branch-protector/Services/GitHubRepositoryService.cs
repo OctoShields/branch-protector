@@ -91,7 +91,7 @@ namespace branch_protector.Services
 
                 // Create Issue to notify user of successful Branch update
                 newIssue = await CreateIssue(repository, new IssuePT(BranchProtectorConstants.issueBranchProtectionsTitle,
-                                                                     BranchProtectorConstants.issueBranchProtectionsBody));
+                                                                     BranchProtectorConstants.GenerateIssueBranchProtectionsBody(repository.Sender)));
             }
             catch (Exception ex)
             {
