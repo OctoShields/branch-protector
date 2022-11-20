@@ -69,6 +69,7 @@ The current state of the project is not production ready and is more a POC than 
 - [GitHub CLI](https://cli.github.com/)
 - [GitHub Desktop](https://desktop.github.com/)
 - [NGROK](https://ngrok.com/)
+- [Visual Studio Code](https://code.visualstudio.com/)
 - [Visual Studio For Mac 2022](https://visualstudio.microsoft.com/vs/mac/)
 
 ## Resources & Libraries
