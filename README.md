@@ -4,11 +4,13 @@ Simple web service, that actively monitors new Repositories across a GitHub Orga
 ### About Solution
 The solution leverages `GitHub's Octokit .NET` Library, which is used on the server to handle authenticating as a GitHub App Installation and making calls to the GitHub API on behalf of the organization. I used the **GitHub BranchProtections and Issues API's** for automating the creation of Branch Protections and creating issues on the organization's repositories.
 
-The GitHub App is notified in realtime of new repositories created across the organization by usign a Webhook that listens to the "repository.createed" GitHub Event. The web service leverages  the `GitHub's Octokit.Webhook .NET` Library to process the incoming GitHub Events.
+The GitHub App is notified in realtime of new repositories created across the organization by usign a Webhook that listens to the "repository.created" GitHub Event. The web service leverages  the `GitHub's Octokit.Webhook .NET` Library to process the incoming GitHub Events.
 
 [Branch Protector GitHub App - Solution Whimsical Diagrams]()
 
-#### Setup Demo
+### Setup Demo
+- **Create GitHub App in your Organization** follow the [Creating a GitHub App](https://docs.github.com/en/developers/apps/building-github-apps/creating-a-github-app) guide and create your first GitHub App.
+- **Generate & Download your GitHub App Private Key** follow the [Authenticating with GitHub Apps](https://docs.github.com/en/developers/apps/building-github-apps/authenticating-with-github-apps) guide to generate and download your Private Key Source File.
 - **Create .env** file in root of `branch-protector` project, that contains your GitHub App configuration and Webhook Secret. (GitHubAppName, GitHubAppId, PATH to your Private Key Source file)
 ```env
 GITHUB_APP_NAME=<replace-with-github-app-name>
@@ -31,6 +33,11 @@ After installing `ngrok`, we can expose our localhost by running `./ngrok http 5
 ngrok http 5095
 ```
 The CLI will print a `*.ngrok.io URL`. We can use to set up our GitHub App webhook.
+
+- **Test the Branch Protector GitHub App** once the web service is running and exposed to the internet, you can create a new Repository in your Organization. The Branch Protector web service will receive the "repository.created" event, create Branch Protections for the `main` branch and create an Issue with a @mention and notify the creator of the repo of Protections applied.
+
+![branch-protector Project Structure](Images/BranchProtectorIssueDemo.png)
+
 
 #### Platforms Supported
 |Platform|Version|
