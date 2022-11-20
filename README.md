@@ -6,7 +6,7 @@ The solution leverages `GitHub's Octokit .NET` Library, which is used on the ser
 
 The GitHub App is notified in realtime of new repositories created across the organization by usign a Webhook that listens to the "repository.createed" GitHub Event. The web service leverages  the `GitHub's Octokit.Webhook .NET` Library to process the incoming GitHub Events.
 
-[Branch Protector GitHub App - Whimsical Diagrams]()
+[Branch Protector GitHub App - Solution Whimsical Diagrams]()
 
 #### Setup Demo
 - **Create .env** file in root of `branch-protector` project, that contains your GitHub App configuration and Webhook Secret. (GitHubAppName, GitHubAppId, PATH to your Private Key Source file)
